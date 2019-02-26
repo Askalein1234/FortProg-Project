@@ -1,6 +1,6 @@
 module Substitutionen where
 import Term
 
-data Subst = Term Term Subst | Subst Term
+data Subst = Subst Term -> Term
 
 single :: VarName -> Term -> Subst
