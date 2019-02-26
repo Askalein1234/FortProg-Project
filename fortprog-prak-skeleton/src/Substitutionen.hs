@@ -1,7 +1,7 @@
 module Substitutionen where
 import Term
 
-data Subst = Subst Term -> Term
+data Subst = Subst (Term -> Term)
 
 identity :: Subst
 identity = \x -> x
