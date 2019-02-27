@@ -4,7 +4,7 @@ import Term
 data Subst = Subst (Term -> Term)
 
 identity :: Subst
-identity = \x -> x
+identity = Subst (\x -> x)
 
 single :: VarName -> Term -> Subst
 
