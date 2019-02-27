@@ -12,3 +12,4 @@ apply :: Subst -> Term -> Term
 apply (Subst s) = s
 
 compose :: Subst -> Subst -> Subst
+compose (Subst f) (Subst g) = Subst (f . g)
