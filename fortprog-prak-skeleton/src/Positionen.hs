@@ -12,20 +12,16 @@ below xs ys = (length xs) > (length ys)
 leftOf :: Pos -> Pos -> Bool
 leftOf xs [] = False
 leftOf [] ys = False
-leftOf (x:xs) (y:ys) = if x < y 
-                         then True
-                         else if x > y
-                                then False
-                                else leftOf xs ys
+leftOf (x:xs) (y:ys) = if x == y 
+                         then leftOf xs ys
+                         else x < y
 
 rightOf :: Pos -> Pos -> Bool
 rightOf xs [] = False
 rightOf [] ys = False
-rightOf (x:xs) (y:ys) = if x > y 
-                          then True
-                          else if x < y
-                                 then False
-                                 else rightOf xs ys
+rightOf (x:xs) (y:ys) = if x == y 
+                          then rightOf xs ys
+                          else x > y
 
 selectAt :: Term -> Pos -> Term
 selectAt (Var v)     _      = Var v
