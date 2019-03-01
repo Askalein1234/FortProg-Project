@@ -1,2 +1,2 @@
 @echo off
-ghci
+ghci -Wall

@@ -1,22 +1,17 @@
 module Substitutionen where
 import Term
 
-type Subst = Term -> Term
+type Subst = VarName -> Term
 
 identity :: Subst
-identity = \x -> x
+identity = \x -> Var x
 
 single :: VarName -> Term -> Subst
-single y t = replace y t
-  where
-      replace y t x = case x of 
-                        Var v -> if (v == y) 
-                                   then t
-                                   else Var v
-                        Comb c ts -> Comb c (map (replace y t) ts)
+single y t = \x -> if x == y then t else Var y
 
 apply :: Subst -> Term -> Term
-apply s = s
+apply s (Var v)     = s v
+apply s (Comb x xs) = Comb x $ map (apply s) xs
 
 compose :: Subst -> Subst -> Subst
-compose f g = f . g
+compose f g = \x -> apply g $ apply f (Var x)

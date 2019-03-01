@@ -5,10 +5,20 @@ import Substitutionen
 match :: Term -> Term -> Maybe Subst
 match (Var v)     t           = Just $ single v t
 match (Comb _ _)  (Var _)     = Nothing
-match (Comb m xs) (Comb m ys) = if m == n then matchList xs ys else Nothing
-    where
-        matchList []     _      = Nothing
-        matchList _      []     = Nothing
-        matchList (x:xs) (y:ys) = case (matchList xs ys, match x y) of 
-                                    (Just t, Just t') -> Just $ t' . t
-                                    (_, _)            -> Nothing
+match (Comb n xs) (Comb m ys) 
+            | m == n          = matchList xs ys
+            | otherwise       = Nothing
+                where
+                    matchList xs' ys' = if length xs' == length ys' && notContainsNothing (map (\x -> match (xs'!!x) (ys'!!x)) [0..(length xs' - 1)])
+                                            then Just $ foldr compose identity (map (\x -> fromJust (match (xs'!!x) (ys'!!x))) [0..(length xs' - 1)])
+                                            else Nothing
+                                            
+                    notContainsNothing :: [Maybe Subst] -> Bool
+                    notContainsNothing [] = True
+                    notContainsNothing (x:xs') = case x of 
+                                                    Just _  -> notContainsNothing xs'
+                                                    Nothing -> False
+
+                    fromJust :: Maybe a -> a
+                    fromJust (Just b) = b
+                    fromJust Nothing = error "GEHT NICHT!!! ANGEWACHSEN!!!"
