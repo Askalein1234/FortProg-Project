@@ -18,3 +18,18 @@ match (Comb n xs) (Comb m ys) = if (length xs) == (length ys) &&
 
 fromJust :: Maybe a -> a
 fromJust (Just b) = b
+
+match1 :: Term -> Term -> Maybe Subst
+match1 (Var v)     t           = Just $ single v t
+match1 (Comb _ _)  (Var _)     = Nothing
+match1 (Comb _ xs) (Comb _ ys) = matchList xs ys
+    where
+        matchList []     _      = Nothing
+        matchList _      []     = Nothing
+        matchList (x:xs) (y:ys) = let rest = matchList xs ys
+                                      head = match x y in
+                                    case rest of 
+                                        Nothing -> head
+                                        Just t  -> case head of
+                                                    Nothing -> rest
+                                                    Just t' -> Just $ t' . t

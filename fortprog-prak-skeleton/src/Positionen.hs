@@ -1,5 +1,6 @@
 module Positionen where
 import Term
+import Substitutionen
 
 type Pos = [Int]
 
