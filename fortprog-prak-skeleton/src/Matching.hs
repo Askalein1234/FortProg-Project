@@ -16,8 +16,8 @@ match (Comb n xs) (Comb m ys) = if (length xs) == (length ys) &&
                                   Just a  -> notContainsNothing xs
                                   Nothing -> False
 
-fromJust :: Maybe a -> a
-fromJust (Just b) = b
+    fromJust :: Maybe a -> a
+    fromJust (Just b) = b
 
 match1 :: Term -> Term -> Maybe Subst
 match1 (Var v)     t           = Just $ single v t
