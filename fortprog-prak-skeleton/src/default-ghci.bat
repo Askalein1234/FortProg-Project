@@ -1,2 +1,2 @@
 @echo off
-ghci -Wall
+ghci -Wall Main.hs

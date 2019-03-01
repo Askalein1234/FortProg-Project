@@ -1,6 +1,7 @@
-module Matching where
+module Matching(match) where
 import Term
 import Substitutionen
+import Helper
 
 match :: Term -> Term -> Maybe Subst
 match (Var v)     t           = Just $ single v t
@@ -18,7 +19,3 @@ match (Comb n xs) (Comb m ys)
                     notContainsNothing (x:xs') = case x of 
                                                     Just _  -> notContainsNothing xs'
                                                     Nothing -> False
-
-                    fromJust :: Maybe a -> a
-                    fromJust (Just b) = b
-                    fromJust Nothing = error "GEHT NICHT!!! ANGEWACHSEN!!!"
