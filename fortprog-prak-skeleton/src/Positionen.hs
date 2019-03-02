@@ -43,8 +43,9 @@ replaceAt (Comb n xs) (p:ps) t = Comb n (map (\x -> if (x == xs!!p)
 
 allPos :: Term -> [Pos]
 allPos t = map (\x -> take (length x - 1) x) (allPosWithPlaceholder t)
- where
+  where
     allPosWithPlaceholder (Var _)     = []
     allPosWithPlaceholder (Comb _ xs) = concatMap 
-                                        (\x -> map (\y -> x : y) ([-1] : allPosWithPlaceholder (xs!!x))) 
+                                        (\x -> map (\y -> x : y) 
+                                          ([-1] : allPosWithPlaceholder (xs!!x))) 
                                         [0..((length xs) - 1)]
