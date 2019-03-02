@@ -1,4 +1,4 @@
-module Main where
+module Testing where
 
 import Matching
 import Parser
@@ -7,10 +7,8 @@ import PrettyPrinting
 import Prog
 import Substitutionen
 import Term
-
+import Reduction
 import Helper
-
-main = putStrLn (show test)
 
 term1 :: Term
 term1 = Comb "Test1" [Comb "Test2" [Var "Test4", Var "Test5"], Comb "Test3" [Var "Test6"]]
