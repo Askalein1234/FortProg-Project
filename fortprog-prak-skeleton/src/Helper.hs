@@ -1,4 +1,4 @@
-module Helper(fromJust) where
+module Helper where
 
 fromJust :: Maybe a -> a
 fromJust (Just b) = b

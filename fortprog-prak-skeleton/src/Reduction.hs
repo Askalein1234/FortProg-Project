@@ -9,22 +9,13 @@ import Positionen
 
 findRule :: Prog -> Term -> Maybe (Rhs, Subst)
 findRule (Prog [])     t = Nothing
-findRule (Prog (r:rs)) t = let try = tryRule r t in
-                             case try of
-                               Nothing -> findRule (Prog rs) t
-                               Just _  -> try
+findRule (Prog (r:rs)) t = processMaybe (tryRule r t) (\x -> Just x) (findRule (Prog rs) t)
   where
     tryRule :: Rule -> Term -> Maybe (Rhs, Subst)
-    tryRule (Rule l r) t = let res = match t l in 
-                             case res of
-                               Nothing -> Nothing
-                               Just _  -> Just (r, fromJust res)
+    tryRule (Rule l r) t = processMaybe (match t l) (\x -> Just (r, x)) Nothing
                                
 reduceAt :: Prog -> Term -> Pos -> Maybe Term
-reduceAt p t x = let res = findRule p (selectAt t x) in
-                   case res of 
-                     Nothing -> Nothing
-                     Just _  -> Just (selectAt t x)
+reduceAt p t x = processMaybe (findRule p (selectAt t x)) (\_ -> Just (selectAt t x)) Nothing
                      
 reduciblePos :: Prog -> Term -> [Pos]
 reduciblePos p t = filter (\x -> not(isNothing(reduceAt p t x))) (allPos t)
