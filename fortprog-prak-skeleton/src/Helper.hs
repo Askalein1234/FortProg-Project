@@ -5,7 +5,7 @@ fromJust (Just b) = b
 fromJust Nothing = error "GEHT NICHT!!! ANGEWACHSEN!!!"
 
 tupelFirst :: (a, b) -> a
-tupelFirst (x, y) = x
+tupelFirst (x, _) = x
 
 isNothing :: Maybe a -> Bool
 isNothing (Just _)  = False

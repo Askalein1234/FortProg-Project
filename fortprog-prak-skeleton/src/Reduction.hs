@@ -8,11 +8,11 @@ import Helper
 import Positionen
 
 findRule :: Prog -> Term -> Maybe (Rhs, Subst)
-findRule (Prog [])     t = Nothing
+findRule (Prog [])     _ = Nothing
 findRule (Prog (r:rs)) t = processMaybe (tryRule r t) (\x -> Just x) (findRule (Prog rs) t)
   where
     tryRule :: Rule -> Term -> Maybe (Rhs, Subst)
-    tryRule (Rule l r) t = processMaybe (match t l) (\x -> Just (r, x)) Nothing
+    tryRule (Rule l r') t' = processMaybe (match t' l) (\x -> Just (r', x)) Nothing
                                
 reduceAt :: Prog -> Term -> Pos -> Maybe Term
 reduceAt p t x = processMaybe (findRule p (selectAt t x)) (\_ -> Just (selectAt t x)) Nothing
