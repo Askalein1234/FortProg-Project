@@ -13,10 +13,10 @@ findRule (Prog (r:rs)) t = processMaybe (tryRule r t) (\x -> Just x) (findRule (
   where
     tryRule :: Rule -> Term -> Maybe (Rhs, Subst)
     tryRule (Rule l r') t' = processMaybe (match t' l) (\x -> Just (r', x)) Nothing
-                               
+
 reduceAt :: Prog -> Term -> Pos -> Maybe Term
-reduceAt p t x = processMaybe (findRule p (selectAt t x)) (\_ -> Just (selectAt t x)) Nothing
-                     
+reduceAt p t x = processMaybe (findRule p (selectAt t x)) (\(y, _) -> Just (replaceAt t x y)) Nothing
+
 reduciblePos :: Prog -> Term -> [Pos]
 reduciblePos p t = filter (\x -> not(isNothing(reduceAt p t x))) (allPos t)
 

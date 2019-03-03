@@ -1,5 +1,6 @@
 module Positionen(above, below, leftOf, rightOf, selectAt, replaceAt, allPos, Pos) where
 import Term
+import Helper
 
 type Pos = [Int]
 
@@ -34,12 +35,9 @@ selectAt (Comb n xs) []     = Comb n xs
 selectAt (Comb _ xs) (p:ps) = selectAt (xs!!p) ps
 
 replaceAt :: Term -> Pos -> Term -> Term
-replaceAt _ []               t = t
+replaceAt _           []     t = t
 replaceAt (Var v)     _      _ = Var v
-replaceAt (Comb n xs) (p:ps) t = Comb n (map (\x -> if (x == xs!!p)
-                                                    then replaceAt x ps t
-                                                    else x) 
-                                              xs)
+replaceAt (Comb n xs) (p:ps) t = Comb n (replaceElem p (\x -> replaceAt x ps t) xs)
 
 allPos :: Term -> [Pos]
 allPos t = map (\x -> take (length x - 1) x) (allPosWithPlaceholder t)
