@@ -13,17 +13,58 @@ import Data.List
 type Strategy = Prog -> Term -> [Pos]
 
 loStrategy :: Strategy
-loStrategy = \p t -> [head (sortBy comparator (reduciblePos p t))]
-  where
-    comparator []     []     = compare 1 0
-    comparator (x:xs) []     = compare 1 0 -- Hier wird der längere gewählt, ist aber glaube ich egal
-    comparator []     (y:ys) = compare 0 1
-    comparator (x:xs) (y:ys) = if x == y then comparator xs ys else compare x y
-    
+loStrategy = strat True True
+
 liStrategy :: Strategy
-liStrategy = \p t -> [head (sortBy comparator (reduciblePos p t))]
+liStrategy = strat True False
+
+roStrategy :: Strategy
+roStrategy = strat False True
+
+riStrategy :: Strategy
+riStrategy = strat False False
+
+poStrategy :: Strategy
+poStrategy = \p t -> let res = reduciblePos p t in 
+                       filter (\x -> (length x) == minimum(map length res)) res
+
+piStrategy :: Strategy
+piStrategy = \p t -> let res = reduciblePos p t in 
+                       filter (\x -> (length x) == maximum(map length res)) res
+
+-- True/False
+--       L/R     O/I     Output
+strat :: Bool -> Bool -> Strategy
+strat lr oi = \p t -> [head (sortBy (comparator lr oi) (reduciblePos p t))]
   where
-    comparator []     []     = compare 1 0
-    comparator (x:xs) []     = compare 1 0 -- Hier wird der längere gewählt, ist aber glaube ich egal
-    comparator []     (y:ys) = compare 0 1
-    comparator (x:xs) (y:ys) = if x == y then comparator xs ys else compare x y
+    comparator :: Bool -> Bool -> Pos -> Pos -> Ordering
+    comparator lr oi []     []     = compare 1 0
+    comparator lr oi (x:xs) []     = if (oi) then compare 1 0 else compare 0 1
+    comparator lr oi []     (y:ys) = if (oi) then compare 0 1 else compare 1 0
+    comparator lr oi (x:xs) (y:ys) = if (length xs) == (length ys) 
+                                     then (if x == y 
+                                           then (comparator lr oi xs ys) 
+                                           else (if (lr)
+                                                 then compare x y
+                                                 else compare y x)) 
+                                     else (if (oi) 
+                                           then compare (length xs) (length ys) 
+                                           else compare (length ys) (length xs))
+
+reduceWith :: Strategy -> Prog -> Term -> Maybe Term
+reduceWith s p t = if (null(s p t)) 
+                   then Nothing 
+                   else reduceAll (s p t) p t
+  where
+    reduceAll :: [Pos] -> Prog -> Term -> Maybe Term
+    reduceAll []     p t = Just t
+    reduceAll (r:rs) p t = case (reduceAt p t r) of
+                             Nothing -> Just t
+                             Just a  -> reduceAll rs p a
+                             
+evaluateWith :: Strategy -> Prog -> Term -> Term
+evaluateWith s p t = if (isNormalForm p t)
+                     then t
+                     else case (reduceWith s p t) of
+                            Nothing -> t
+                            Just a  -> evaluateWith s p a

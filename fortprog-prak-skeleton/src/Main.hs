@@ -19,6 +19,7 @@ term2 = Comb "Test1" [Comb "Test2" [Comb "Test4" [Var "Test7"], Comb "Test5" [Va
 term3 = (Comb "+" [Var "2", Var "2"])
 squareTerm = (Comb "square" [Comb "+" [literal("1"), literal("2")]]) -- Definition 3.8
 squaredTerm = (Comb "*" [Comb "+" [Comb "1" [],Comb "2" []],Comb "+" [Comb "1" [],Comb "2" []]])
+addTerm = Comb "+" [(Comb "+" [literal("1"), literal("2")]), (Comb "+" [literal("1"), literal("2")])]
 
 testProg1 = (Prog [Rule (Comb "+" [Var "1", Var "1"]) (Var "2")])
 testProg2 = (Prog [Rule (Var "1") (Comb "+" [Var "1", Var "1"])])
@@ -26,6 +27,7 @@ testProg3 = Prog [Rule (Comb "+" [literal("1"), literal("2")]) (literal("3")),
                   Rule (Comb "square" [Var ("x")]) (Comb "*" [Var "x", Var "x"])]
 squareProg = Prog [Rule (Comb "square" [Var ("x")]) (Comb "*" [Var "x", Var "x"])]
 addProg = Prog [Rule (Comb "+" [literal("1"), literal("2")]) (literal("3"))]
+addVarProg = Prog [Rule (Comb "+" [Var "x", Var "y"]) (Var "x+y")]
 
 test = apply (fromJust subst) term1
 test2 = reduceAt testProg3 (Comb "*" [Comb "+" [Comb "1" [],Comb "2" []],Comb "+" [Comb "1" [],Comb "2" []]]) [0]
