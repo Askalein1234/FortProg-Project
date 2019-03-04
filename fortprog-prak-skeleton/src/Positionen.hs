@@ -40,7 +40,7 @@ replaceAt (Var v)     _      _ = Var v
 replaceAt (Comb n xs) (p:ps) t = Comb n (replaceElem p (\x -> replaceAt x ps t) xs)
 
 allPos :: Term -> [Pos]
-allPos t = map (\x -> take (length x - 1) x) (allPosWithPlaceholder t)
+allPos t = [] : (map (\x -> take (length x - 1) x) (allPosWithPlaceholder t))
   where
     allPosWithPlaceholder (Var _)     = []
     allPosWithPlaceholder (Comb _ xs) = concatMap 
