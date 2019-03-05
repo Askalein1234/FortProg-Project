@@ -41,7 +41,7 @@ startLoop = do
 inputLoop :: (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose) -> IO ()
 inputLoop (_, _, _, _, True)  = return ()
 inputLoop (p, n, l, s, False) = do 
-  putStr (n ++ ">")
+  putStr (n ++ "> ")
   input <- getLine
   output <- processInput p n l s input
   inputLoop output

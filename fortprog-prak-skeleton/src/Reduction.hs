@@ -21,7 +21,7 @@ reduceAt p t x = processMaybe (findRule p (selectAt t x))
                    (\(r, s) -> Just (apply s (replaceAt t x r))) Nothing
 
 applyRule :: Term -> Rule -> Term
-applyRule t@(Var v) (Rule l r) = if (l == t) then r else t
+applyRule t@(Var _) (Rule l r) = if (l == t) then r else t
 applyRule t@(Comb n xs) (Rule l r) = if (l == t) 
                                    then r 
                                    else Comb n (map (\x -> applyRule x (Rule l r)) xs)
@@ -30,4 +30,4 @@ reduciblePos :: Prog -> Term -> [Pos]
 reduciblePos p t = filter (not . isNothing . reduceAt p t) $ allPos t
 
 isNormalForm :: Prog -> Term -> Bool
-isNormalForm p = isNothing . findRule p
+isNormalForm p t = null(reduciblePos p t)
