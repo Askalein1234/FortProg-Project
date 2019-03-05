@@ -4,6 +4,7 @@ import Prog
 import Term
 import Parser
 import Evaluation
+import PrettyPrinting
 import System.FilePath.Windows
 import PrettyPrinting
 
