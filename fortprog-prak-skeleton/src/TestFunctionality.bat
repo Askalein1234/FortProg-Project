@@ -1,3 +1,3 @@
 @echo off
 
-ghci Main.hs
+ghci Test.hs
