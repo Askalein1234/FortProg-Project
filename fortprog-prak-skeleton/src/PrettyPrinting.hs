@@ -6,6 +6,7 @@ import Data.List
 class Pretty a where
     pretty :: a -> String
     
+-- make a Term Pretty
 instance Pretty Term where
     pretty (Var name) = name
     pretty (Comb name []) = name

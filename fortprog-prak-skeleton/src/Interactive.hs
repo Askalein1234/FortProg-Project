@@ -5,6 +5,7 @@ import Term
 import Parser
 import Evaluation
 import System.FilePath.Windows
+import PrettyPrinting
 
 type ProgName = String
 type LastFileLoadCommand = String
@@ -79,7 +80,8 @@ processInput p n l s input
   | otherwise                           = case (parse::String -> Either String Term) input of 
                                             Left m  -> do putStrLn m
                                                           return (p, n, l, s, False)
-                                            Right t -> do putStrLn $ show $ evaluateWith s p t
+                                            Right t -> do putStrLn $ pretty t
+                                                          putStrLn $ pretty $ evaluateWith s p t
                                                           return (p, n, l, s, False)
   where
     loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String -> IO (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)

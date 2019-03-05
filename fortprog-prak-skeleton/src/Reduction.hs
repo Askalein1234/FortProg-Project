@@ -27,7 +27,7 @@ applyRule (Comb n xs) (Rule l r) = if (l == (Comb n xs))
                                    else Comb n (map (\x -> applyRule x (Rule l r)) xs)
 
 reduciblePos :: Prog -> Term -> [Pos]
-reduciblePos p t = filter (\x -> not(isNothing(reduceAt p t x))) (allPos t)
+reduciblePos p t = filter (not . isNothing . reduceAt p t) $ allPos t
 
 isNormalForm :: Prog -> Term -> Bool
-isNormalForm p t = isNothing(findRule p t)
+isNormalForm p = isNothing . findRule p

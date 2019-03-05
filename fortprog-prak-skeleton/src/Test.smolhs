@@ -1,1 +1,5 @@
-plus one one = two
+data Peano = Succ Peano | Zero
+
+add :: Peano -> Peano -> Peano
+add Zero     b = b
+add (Succ a) b = Succ (add a b)
