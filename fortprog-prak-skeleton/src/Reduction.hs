@@ -21,8 +21,8 @@ reduceAt p t x = processMaybe (findRule p (selectAt t x))
                    (\(r, s) -> Just (apply s (replaceAt t x r))) Nothing
 
 applyRule :: Term -> Rule -> Term
-applyRule (Var v) (Rule l r) = if (l == (Var v)) then r else (Var v)
-applyRule (Comb n xs) (Rule l r) = if (l == (Comb n xs)) 
+applyRule t@(Var v) (Rule l r) = if (l == t) then r else t
+applyRule t@(Comb n xs) (Rule l r) = if (l == t) 
                                    then r 
                                    else Comb n (map (\x -> applyRule x (Rule l r)) xs)
 

@@ -13,6 +13,6 @@ instance Pretty Term where
     pretty (Comb name ts) = name ++ " " ++
                                 intercalate " " (map (\t ->
                                     case t of
-                                        Comb name' []     -> name'
-                                        Comb name' (t':_) -> "(" ++ name' ++ " " ++ pretty t' ++ ")"
-                                        Var  name'        -> name') ts)
+                                        Comb name' []    -> name'
+                                        Comb _     (_:_) -> "(" ++ pretty t ++ ")"
+                                        Var  name'       -> name') ts)
