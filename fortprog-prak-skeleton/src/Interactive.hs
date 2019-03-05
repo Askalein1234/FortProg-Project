@@ -3,11 +3,6 @@ module Interactive where
 import Prog
 import Term
 import Parser
-import Substitutionen
-import Matching
-import Helper
-import Positionen
-import Reduction
 import Evaluation
 import System.FilePath.Windows
 
@@ -58,7 +53,7 @@ processInput p n l s input
   | input == ":q" || input == ":quit"   = do return (p, n, l, s, True)
   | input == ":d" || input == ":debug"   = do putStrLn ("Prog: " ++ (show p) ++ 
                                                         "\nProgName: " ++ (show n) ++ 
-                                                        "\LastFileLoadCommand: " ++ (show l))
+                                                        "\nLastFileLoadCommand: " ++ (show l))
                                               return (p, n, l, s, False)
   | input == ":r" || input == ":reload" = if l == ""
                                           then do putStrLn "You haven't laoded a file yet!"
@@ -87,10 +82,10 @@ processInput p n l s input
                                             Right t -> do putStrLn $ show $ evaluateWith s p t
                                                           return (p, n, l, s, False)
   where
-    loadFile :: Prog -> ProgName -> LastFile -> Strategy -> String -> IO (Prog, ProgName, LastFile, Strategy, MarkForClose)
-    loadFile p n l s input = do parseOut <- (parseFile::FilePath -> IO (Either String Prog)) ((words input)!!1)
-                                case parseOut of 
-                                  Left m  -> do putStrLn m
-                                                return (p, n, l, s, False)
-                                  Right p' -> do putStrLn $ "Loaded " ++ takeBaseName ((words input)!!1) ++ "!"
-                                                 return (p', takeBaseName ((words input)!!1), input, s, False)
+    loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String -> IO (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
+    loadFile p' n' l' s' loadInput = do parseOut <- (parseFile::FilePath -> IO (Either String Prog)) ((words loadInput)!!1)
+                                        case parseOut of 
+                                          Left m  -> do putStrLn m
+                                                        return (p', n', l', s', False)
+                                          Right p'' -> do putStrLn $ "Loaded " ++ takeBaseName ((words loadInput)!!1) ++ "!"
+                                                          return (p'', takeBaseName ((words loadInput)!!1), loadInput, s', False)
