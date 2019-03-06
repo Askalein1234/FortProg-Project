@@ -44,6 +44,7 @@ strat lr oi = \p t -> [head (sortBy (comparator lr oi) (reduciblePos p t))]
       | oi' &&      (below   p1 p2) = GT
       | not(oi') && (above   p1 p2) = GT
       | not(oi') && (below   p1 p2) = LT
+      | otherwise                   = comparator lr' oi' (tail p1) (tail p2)
 
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
 reduceWith s p t = if (null(s p t)) 
