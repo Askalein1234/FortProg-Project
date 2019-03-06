@@ -55,20 +55,19 @@ processInput p n l s input
   | input == ":h" || input == ":help"   = do putStr helpMessage
                                              return (p, n, l, s, False)
   | input == ":q" || input == ":quit"   = do return (p, n, l, s, True)
-  | input == ":d" || input == ":debug"   = do putStrLn ("Prog: " ++ (show p) ++ 
+  | input == ":d" || input == ":debug"  = do putStrLn ("Prog: " ++ (show p) ++ 
                                                         "\nProgName: " ++ (show n) ++ 
                                                         "\nLastFileLoadCommand: " ++ (show l))
-                                              return (p, n, l, s, False)
+                                             return (p, n, l, s, False)
   | input == ":r" || input == ":reload" = if l == ""
                                           then do putStrLn "You haven't laoded a file yet!"
                                                   return (p, n, l, s, False)
                                           else do out <- loadFile p n l s l
                                                   return out
+  | input == ":l" || input == ":load"   = return (Prog [], "", l, s, False)
   | (words input)!!0 == ":l" ||
-    (words input)!!0 == ":load"         = if length (words input) == 1
-                                          then return (Prog [], "", l, s, False)
-                                          else do out <- loadFile p n l s input
-                                                  return out
+    (words input)!!0 == ":load"         = do out <- loadFile p n l s input
+                                             return out
   | length (words input) == 2 && 
     ((words input)!!0 == ":s" ||
      (words input)!!0 == ":set")        = case (words input)!!1 of 
@@ -86,11 +85,15 @@ processInput p n l s input
                                             Right t -> do putStrLn $ pretty $ evaluateWith s p t
                                                           return (p, n, l, s, False)
   where
-    loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String -> IO (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
-    loadFile p' n' l' s' input = do loadInput <- if elem '.' input then return (input) else return (input ++ ".smolhs")
-                                    parseOut <- (parseFile::FilePath -> IO (Either String Prog)) ((words loadInput)!!1)
+    loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String -> 
+      IO (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
+    loadFile p' n' l' s' input = do loadInput <- if elem '.' input 
+                                                 then return (input) 
+                                                 else return (input ++ ".smolhs")
+                                    parseOut <- (parseFile::FilePath -> 
+                                      IO (Either String Prog)) ((words loadInput)!!1)
                                     case parseOut of 
-                                          Left m  -> do putStrLn m
-                                                        return (p', n', l', s', False)
-                                          Right p'' -> do putStrLn $ "Loaded " ++ takeBaseName ((words loadInput)!!1) ++ "!"
-                                                          return (p'', takeBaseName ((words loadInput)!!1), loadInput, s', False)
+                                      Left m  -> do putStrLn m
+                                                    return (p', n', l', s', False)
+                                      Right pr -> do putStrLn $ "Loaded " ++ takeBaseName ((words loadInput)!!1) ++ "!"
+                                                     return (pr, takeBaseName ((words loadInput)!!1), loadInput, s', False)

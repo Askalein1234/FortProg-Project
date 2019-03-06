@@ -35,18 +35,15 @@ strat :: Bool -> Bool -> Strategy
 strat lr oi = \p t -> [head (sortBy (comparator lr oi) (reduciblePos p t))]
   where
     comparator :: Bool -> Bool -> Pos -> Pos -> Ordering
-    comparator _   _   []     []      = EQ
-    comparator _   oi' (_:_)  []      = if (oi') then GT else LT
-    comparator _   oi' []     (_:_)   = if (oi') then LT else GT
-    comparator lr' oi'  (x:xs) (y:ys) = if x == y
-                                        then (if (length xs) == (length ys) 
-                                              then (comparator lr' oi' xs ys) 
-                                              else (if (oi')
-                                                    then compare (length xs) (length ys)
-                                                    else compare (length ys) (length xs))) 
-                                        else (if (lr') 
-                                              then compare x y 
-                                              else compare y x)
+    comparator lr' oi' p1 p2
+      | lr' &&      (leftOf  p1 p2) = LT
+      | lr' &&      (rightOf p1 p2) = GT
+      | not(lr') && (leftOf  p1 p2) = GT
+      | not(lr') && (rightOf p1 p2) = LT
+      | oi' &&      (above   p1 p2) = LT
+      | oi' &&      (below   p1 p2) = GT
+      | not(oi') && (above   p1 p2) = GT
+      | not(oi') && (below   p1 p2) = LT
 
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
 reduceWith s p t = if (null(s p t)) 
