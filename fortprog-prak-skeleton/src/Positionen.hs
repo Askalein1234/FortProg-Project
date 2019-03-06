@@ -23,11 +23,7 @@ leftOf (x:xs) (y:ys) = if x == y
                          else x < y
 
 rightOf :: Pos -> Pos -> Bool
-rightOf _ [] = False
-rightOf [] _ = False
-rightOf (x:xs) (y:ys) = if x == y 
-                          then rightOf xs ys
-                          else x > y
+rightOf xs ys = leftOf ys xs
 
 selectAt :: Term -> Pos -> Term
 selectAt (Var v)     _      = Var v
