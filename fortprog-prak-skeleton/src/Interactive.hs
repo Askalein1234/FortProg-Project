@@ -1,4 +1,4 @@
-module Interactive where
+module Interactive(startLoop) where
 
 import Prog
 import Term
