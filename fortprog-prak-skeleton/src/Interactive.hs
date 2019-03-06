@@ -8,6 +8,7 @@ import PrettyPrinting()
 import System.FilePath.Windows
 import PrettyPrinting
 import System.IO
+import System.Console.ANSI
 
 type ProgName = String
 type LastFileLoadCommand = String
@@ -35,9 +36,12 @@ helpMessage = unlines
 
 startLoop :: IO ()
 startLoop = do 
+  setSGR [SetColor Foreground Vivid Red]
+  setTitle "Smol Haskell"
   putStr header
   inputLoop (Prog [], "", "", loStrategy, False)
   putStrLn "cya fam"
+  setSGR [Reset]
 
 inputLoop :: (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose) -> IO ()
 inputLoop (_, _, _, _, True)  = return ()
@@ -51,10 +55,10 @@ inputLoop (p, n, l, s, False) = do
 processInput :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String ->
                   IO (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
 processInput p n l s input 
-  | input == ""                         = do return (p, n, l, s, False)
+  | input == ""        = do return (p, n, l, s, False)
   | input == ":h" || 
     input == ":help"   = do putStr helpMessage
-                                             return (p, n, l, s, False)
+                            return (p, n, l, s, False)
   | input == ":q" || 
     input == ":quit"   = do return (p, n, l, s, True)
   | input == ":d" || 
@@ -69,12 +73,13 @@ processInput p n l s input
                          else do out <- loadFile p n l s l
                                  return out
   | input == ":l" || 
-    input == ":load"   = return (Prog [], "", l, s, False)
+    input == ":load"   = do setTitle "Smol Haskell"
+                            return (Prog [], "", l, s, False)
   | (words input)!!0 == 
     ":l" ||
     (words input)!!0 == 
     ":load"            = do out <- loadFile p n l s input
-                                   return out
+                            return out
   | length (words input) 
     == 2 && 
     ((words input)!!0 == 
@@ -87,7 +92,8 @@ processInput p n l s input
                            "ri" -> return (p, n, l, riStrategy, False)
                            "po" -> return (p, n, l, poStrategy, False)
                            "pi" -> return (p, n, l, piStrategy, False)
-                           _    -> do putStrLn "I don't know that evaluation strategy :/"
+                           _    -> do putStrLn 
+                                        "I don't know that evaluation strategy :/"
                                       return (p, n, l, s, False)
   | otherwise          = case (parse::String -> Either String Term) input of 
                            Left m  -> do putStrLn m
@@ -108,5 +114,7 @@ processInput p n l s input
                          return (p', n', l', s', False)
            Right pr -> do putStrLn $ "Loaded " ++ takeBaseName 
                             ((words loadInput)!!1) ++ "!"
+                          setTitle ("Smol Haskell - " ++ takeBaseName 
+                            ((words loadInput)!!1))
                           return (pr, takeBaseName ((words loadInput)!!1), 
                             loadInput, s', False)
