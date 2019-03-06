@@ -7,6 +7,7 @@ import Evaluation
 import PrettyPrinting()
 import System.FilePath.Windows
 import PrettyPrinting
+import System.IO
 
 type ProgName = String
 type LastFileLoadCommand = String
@@ -42,6 +43,7 @@ inputLoop :: (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose) -> IO
 inputLoop (_, _, _, _, True)  = return ()
 inputLoop (p, n, l, s, False) = do 
   putStr (n ++ "> ")
+  hFlush stdout
   input <- getLine
   output <- processInput p n l s input
   inputLoop output
