@@ -31,7 +31,9 @@ poStrategy :: Strategy
 --                       filter (\x -> (length x) == minimum(map length res)) res
 poStrategy p t = 
   let res = reduciblePos p t 
-  in  filter (\x -> foldl (\x' y -> x' && (not $ above x y)) True res) res
+  in if elem [] res
+      then [[]]
+      else filter (\x -> foldl (\x' y -> x' && (not $ above x y)) True res) res
 
 piStrategy :: Strategy
 --piStrategy = \p t -> let res = reduciblePos p t in 
@@ -80,7 +82,7 @@ reduceWith s p t = if (null(s p t))
     reduceAll :: [Pos] -> Prog -> Term -> Maybe Term
     reduceAll []     _  t' = Just t'
     reduceAll (r:rs) p' t' = case (reduceAt p' t' r) of
-                               Nothing -> Just t'
+                               Nothing -> reduceAll rs p' t'
                                Just a  -> reduceAll rs p' a
                              
 evaluateWith :: Strategy -> Prog -> Term -> Term
