@@ -7,6 +7,7 @@ import Evaluation
 import PrettyPrinting()
 import System.FilePath.Windows
 import PrettyPrinting
+import Reduction
 import System.IO
 import System.Console.ANSI
 import Data.List.Split
@@ -63,7 +64,7 @@ startLoop = do
   setTitle "Smol Haskell"
   putStr header
   inputLoop (Prog [], "", "", loStrategy, False)
-  setSGR [SetColor Foreground Vivid Blue]
+  setSGR [SetColor Foreground Vivid Magenta]
   putStr quitMessage
   setTitle "Ordinary Console Title"
   setSGR [Reset]
@@ -97,6 +98,18 @@ processInput p n l s input
                                       "\nLastFileLoadCommand: " ++ (show l))
                             setSGR [SetColor Background Dull Black]
                             return (p, n, l, s, False)
+  | (words input)!!0 == ":d"
+                       = do setSGR [SetColor Foreground Vivid Blue]
+                            setSGR [SetColor Background  Vivid White]
+                            input' <- return (drop 3 input)
+                            case (parse::String -> Either String Term) input' of 
+                              Left m  -> do setSGR [SetColor Foreground Vivid Red]
+                                            putStrLn m
+                                            return (p, n, l, s, False)
+                              Right t -> do debugEval s p t
+                                            return (p, n, l, s, False)
+                            setSGR [SetColor Background Dull Black]
+                            return (p, n, l, s, False)
   | input == ":r" || 
     input == ":reload" = if l == ""
                          then do setSGR [SetColor Foreground Vivid Red]
@@ -110,7 +123,8 @@ processInput p n l s input
   | ((words input)!!0 == ":l" ||
     (words input)!!0 == ":load") &&
     (words input)!!1 == "-d"
-                       = case (parse::String -> Either String Prog) (drop 6 (unlines (splitOn ", " input))) of 
+                       = case (parse::String -> Either String Prog) 
+                           (drop 6 (unlines (splitOn ", " input))) of 
                            Left m  -> do setSGR [SetColor Foreground Vivid Red]
                                          putStrLn m
                                          return (p, n, l, s, False)
@@ -163,3 +177,13 @@ processInput p n l s input
                             ((words loadInput)!!1))
                           return (pr, takeBaseName ((words loadInput)!!1), 
                             loadInput, s', False)
+                            
+    debugEval :: Strategy -> Prog -> Term -> IO ()
+    debugEval s p t = if (isNormalForm p t)
+                      then do putStrLn $ "Normal Form: " ++ (pretty t)
+                              return ()
+                      else case (reduceWith s p t) of
+                             Nothing -> return ()
+                             Just a  -> do putStrLn ("Reduction on pos: " ++ (show (s p t)))
+                                           putStrLn $ pretty $ a
+                                           debugEval s p a

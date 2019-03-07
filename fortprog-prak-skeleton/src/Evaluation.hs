@@ -11,23 +11,17 @@ type Strategy = Prog -> Term -> [Pos]
 
 loStrategy :: Strategy
 loStrategy = strat True True
---loStrategy = \p t -> [head $ reduciblePos p t]
 
 liStrategy :: Strategy
 liStrategy = strat True False
 
 roStrategy :: Strategy
 roStrategy = strat False True
---roStrategy = \p t -> let lst = last $ reduciblePos p t in
---                       [head $ filter (below lst) lst]
 
 riStrategy :: Strategy
 riStrategy = strat False False
---riStrategy = \p t -> [last $ reduciblePos p t]
 
 poStrategy :: Strategy
---poStrategy = \p t -> let res = reduciblePos p t in 
---                       filter (\x -> (length x) == minimum(map length res)) res
 poStrategy p t = 
   let res = reduciblePos p t 
   in if elem [] res
@@ -35,26 +29,9 @@ poStrategy p t =
       else filter (\x -> foldl (\x' y -> x' && (not $ above x y)) True res) res
 
 piStrategy :: Strategy
---piStrategy = \p t -> let res = reduciblePos p t in 
---                       filter (\x -> (length x) == maximum(map length res)) res
 piStrategy p t = 
   let res = reduciblePos p t 
   in  filter (\x -> foldl (\x' y -> x' && (not $ below x y)) True res) res
-
---pStrat :: Bool -> Strategy
---pStrat oi = \p t -> let res = sortBy (comparator oi) $ reduciblePos p t in
---                        filter (\x -> (length x) == length $ res !! 0) res
---  where
---    comparator :: Bool -> Pos -> Pos -> Ordering
---    comparator oi' p1 p2
---      | oi'       && (above p1 p2) = LT
---      | oi'       && (below p1 p2) = GT
---      | not (oi') && (above p1 p2) = GT
---      | not (oi') && (below p1 p2) = LT
---      | otherwise                  = EQ
-
-
--- filter (\x -> foldl (\x' y -> x' && above x y) True res) res
 
 -- True/False
 --       L/R     O/I     Output
