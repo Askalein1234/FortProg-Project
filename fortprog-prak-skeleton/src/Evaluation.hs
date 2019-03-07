@@ -4,7 +4,6 @@ import Prog
 import Term
 import Positionen
 import Reduction
-import Helper
 import Data.List
 
 -- Alias type for evaluation strategies.

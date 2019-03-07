@@ -1,0 +1,59 @@
+-- LO, RO, PO no LI, RI, PI
+oneMain :: Bool
+oneMain = one (loop false)
+
+one :: Bool -> Bool
+one a = True
+
+-------------------------------------------------------------------------------
+
+-- RO no LO
+twoMain :: Bool
+twoMain = two (loop false) false
+
+two :: Bool -> Bool
+two a False = True
+two a True  = False
+
+-------------------------------------------------------------------------------
+
+-- LO no RO
+threeMain :: Bool
+threeMain = three true (loop true)
+
+three :: Bool -> Bool
+three True  b = False
+three False b = True
+
+-------------------------------------------------------------------------------
+
+-- PO no RO, LO
+fourMain :: Bool
+fourMain = four (loop false) false (loop false)
+
+four :: Bool -> Bool -> Bool -> Bool
+four a False c = True
+four a True  c = False
+
+-------------------------------------------------------------------------------
+
+-- no PO
+fiveMain :: Bool
+fiveMain = five
+
+five :: Bool
+five = loop false
+
+-------------------------------------------------------------------------------
+
+-- Helpers
+
+false :: Bool
+false = False
+
+true :: Bool
+true = True
+
+loop :: Bool -> Bool
+loop False = loop True
+loop True  = loop False
