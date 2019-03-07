@@ -1,5 +1,15 @@
-module Positionen(above, below, leftOf, rightOf, selectAt, replaceAt, allPos, Pos) where
+module Positionen(
+  above,
+  below,
+  leftOf,
+  rightOf,
+  selectAt,
+  replaceAt,
+  allPos,
+  Pos) where
+
 import Term
+
 import Helper
 
 type Pos = [Int]
@@ -9,18 +19,18 @@ above []     []     = False
 above []     (_:_)  = True
 above (_:_)  []     = False
 above (x:xs) (y:ys) 
-    | x == y        = above xs ys
-    | otherwise     = False
+  | x == y          = above xs ys
+  | otherwise       = False
 
 below :: Pos -> Pos -> Bool
 below xs ys = above ys xs
 
 leftOf :: Pos -> Pos -> Bool
-leftOf _ [] = False
-leftOf [] _ = False
-leftOf (x:xs) (y:ys) = if x == y 
-                         then leftOf xs ys
-                         else x < y
+leftOf _      []     = False
+leftOf []     _      = False
+leftOf (x:xs) (y:ys)
+  | x == y           = leftOf xs ys
+  | otherwise        = x < y
 
 rightOf :: Pos -> Pos -> Bool
 rightOf xs ys = leftOf ys xs

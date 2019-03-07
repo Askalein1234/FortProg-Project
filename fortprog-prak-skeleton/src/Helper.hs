@@ -2,7 +2,7 @@ module Helper where
 
 fromJust :: Maybe a -> a
 fromJust (Just b) = b
-fromJust Nothing = error "GEHT NICHT!!! ANGEWACHSEN!!!"
+fromJust Nothing  = error "GEHT NICHT!!! ANGEWACHSEN!!!"
 
 tupelFirst :: (a, b) -> a
 tupelFirst (x, _) = x

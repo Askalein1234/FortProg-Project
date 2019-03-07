@@ -1,4 +1,10 @@
-module Substitutionen(identity, single, apply, compose, Subst) where
+module Substitutionen(
+  identity,
+  single,
+  apply,
+  compose,
+  Subst) where
+
 import Term
 
 type Subst = VarName -> Term
