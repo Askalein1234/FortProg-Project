@@ -1,10 +1,12 @@
 module Evaluation where
 
+import Data.List
+
 import Prog
 import Term
+
 import Positionen
 import Reduction
-import Data.List
 
 -- Alias type for evaluation strategies.
 type Strategy = Prog -> Term -> [Pos]
@@ -25,8 +27,10 @@ poStrategy :: Strategy
 poStrategy p t = 
   let res = reduciblePos p t 
   in if elem [] res
-      then [[]]
-      else filter (\x -> foldl (\x' y -> x' && (not $ above x y)) True res) res
+       then 
+         [[]]
+       else
+         filter (\x -> foldl (\x' y -> x' && (not $ above x y)) True res) res
 
 piStrategy :: Strategy
 piStrategy p t = 
@@ -52,18 +56,18 @@ strat lr oi = \p t -> [head (sortBy (comparator lr oi) (reduciblePos p t))]
 
 reduceWith :: Strategy -> Prog -> Term -> Maybe Term
 reduceWith s p t = if (null(s p t)) 
-                   then Nothing 
-                   else reduceAll (s p t) p t
-  where
-    reduceAll :: [Pos] -> Prog -> Term -> Maybe Term
-    reduceAll []     _  t' = Just t'
-    reduceAll (r:rs) p' t' = case (reduceAt p' t' r) of
-                               Nothing -> reduceAll rs p' t'
-                               Just a  -> reduceAll rs p' a
+                     then Nothing 
+                     else reduceAll (s p t) p t
+ where
+  reduceAll :: [Pos] -> Prog -> Term -> Maybe Term
+  reduceAll []     _  t' = Just t'
+  reduceAll (r:rs) p' t' = case (reduceAt p' t' r) of
+                             Nothing -> reduceAll rs p' t'
+                             Just a  -> reduceAll rs p' a
                              
 evaluateWith :: Strategy -> Prog -> Term -> Term
 evaluateWith s p t = if (isNormalForm p t)
-                     then t
-                     else case (reduceWith s p t) of
-                            Nothing -> t
-                            Just a  -> evaluateWith s p a
+                       then t
+                       else case (reduceWith s p t) of
+                              Nothing -> t
+                              Just a  -> evaluateWith s p a

@@ -1,6 +1,6 @@
 module Main where
 
-import Interactive
+import Interactive(startLoop)
 
 main :: IO ()
 main = startLoop
