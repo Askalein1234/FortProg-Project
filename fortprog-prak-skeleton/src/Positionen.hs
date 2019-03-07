@@ -33,13 +33,14 @@ selectAt (Comb _ xs) (p:ps) = selectAt (xs!!p) ps
 replaceAt :: Term -> Pos -> Term -> Term
 replaceAt _           []     t = t
 replaceAt (Var v)     _      _ = Var v
-replaceAt (Comb n xs) (p:ps) t = Comb n (replaceElem p (\x -> replaceAt x ps t) xs)
+replaceAt (Comb n xs) (p:ps) t = 
+  Comb n (replaceElem p (\x -> replaceAt x ps t) xs)
 
 allPos :: Term -> [Pos]
 allPos t = [] : (map (\x -> take (length x - 1) x) (allPosWithPlaceholder t))
   where
     allPosWithPlaceholder (Var _)     = []
-    allPosWithPlaceholder (Comb _ xs) = concatMap 
-                                        (\x -> map (\y -> x : y) 
-                                          ([-1] : allPosWithPlaceholder (xs!!x))) 
-                                        [0..((length xs) - 1)]
+    allPosWithPlaceholder (Comb _ xs) 
+      = concatMap (\x -> map (\y -> x : y) 
+                  ([-1] : allPosWithPlaceholder (xs!!x))) 
+                  [0..((length xs) - 1)]
