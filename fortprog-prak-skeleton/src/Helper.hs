@@ -19,7 +19,6 @@ processMaybe (Just x) f _ = f x
 processMaybe Nothing  _ x = x
 
 replaceElem :: Int -> (a -> a) -> [a] -> [a]
-replaceElem _ _ [] = []
-replaceElem n f (x:xs) = if n == 0 
-                           then ((f x):xs)
-                           else x : (replaceElem (n-1) f xs)
+replaceElem _ _ []     = []
+replaceElem n f (x:xs) | n == 0    = ((f x):xs)
+                       | otherwise = x : (replaceElem (n-1) f xs)
