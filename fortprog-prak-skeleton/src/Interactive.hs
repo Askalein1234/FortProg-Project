@@ -9,6 +9,7 @@ import System.FilePath.Windows
 import PrettyPrinting
 import System.IO
 import System.Console.ANSI
+import Data.List.Split
 
 type ProgName = String
 type LastFileLoadCommand = String
@@ -58,11 +59,11 @@ startLoop :: IO ()
 startLoop = do 
   clearScreen 
   setSGR [SetBlinkSpeed NoBlink]
-  setSGR [SetColor Foreground Vivid Red]
+  setSGR [SetColor Foreground Vivid Magenta]
   setTitle "Smol Haskell"
   putStr header
   inputLoop (Prog [], "", "", loStrategy, False)
-  setSGR [SetColor Foreground Vivid Red]
+  setSGR [SetColor Foreground Vivid Blue]
   putStr quitMessage
   setTitle "Ordinary Console Title"
   setSGR [Reset]
@@ -70,12 +71,12 @@ startLoop = do
 inputLoop :: (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose) -> IO ()
 inputLoop (_, _, _, _, True)  = return ()
 inputLoop (p, n, l, s, False) = do 
-  setSGR [SetColor Foreground Vivid White]
+  setSGR [SetColor Foreground Dull Cyan]
   putStr (n ++ "> ")
   hFlush stdout
-  setSGR [SetColor Foreground Vivid Magenta]
+  setSGR [SetColor Foreground Vivid Cyan]
   input <- getLine
-  setSGR [SetColor Foreground Vivid Yellow]
+  setSGR [SetColor Foreground Vivid Magenta]
   output <- processInput p n l s input
   inputLoop output
 
@@ -106,6 +107,17 @@ processInput p n l s input
   | input == ":l" || 
     input == ":load"   = do setTitle "Smol Haskell"
                             return (Prog [], "", l, s, False)
+  | ((words input)!!0 == ":l" ||
+    (words input)!!0 == ":load") &&
+    (words input)!!1 == "-d"
+                       = case (parse::String -> Either String Prog) (drop 6 (unlines (splitOn ", " input))) of 
+                           Left m  -> do setSGR [SetColor Foreground Vivid Red]
+                                         putStrLn m
+                                         return (p, n, l, s, False)
+                           Right p' -> do setSGR [SetColor Foreground Vivid Green]
+                                          putStrLn "Loaded program!"
+                                          setTitle "Smol Haskell - Unnamed Program"
+                                          return (p', n, l, s, False)
   | (words input)!!0 == ":l" ||
     (words input)!!0 == ":load"            
                        = do out <- loadFile p n l s input

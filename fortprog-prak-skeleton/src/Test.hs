@@ -24,8 +24,7 @@ addTerm = Comb "+" [(Comb "+" [literal("1"), literal("2")]), (Comb "+" [literal(
 
 testProg1 = (Prog [Rule (Comb "+" [Var "1", Var "1"]) (Var "2")])
 testProg2 = (Prog [Rule (Var "1") (Comb "+" [Var "1", Var "1"])])
-testProg3 = Prog [Rule (Comb "+" [literal("1"), literal("2")]) (literal("3")), 
-                  Rule (Comb "square" [Var ("x")]) (Comb "*" [Var "x", Var "x"])]
+testProg3 = Prog [Rule (Comb "+" [literal("1"), literal("2")]) (literal("3")), Rule (Comb "square" [Var ("x")]) (Comb "*" [Var "x", Var "x"])]
 squareProg = Prog [Rule (Comb "square" [Var ("x")]) (Comb "*" [Var "x", Var "x"])]
 addProg = Prog [Rule (Comb "+" [literal("1"), literal("2")]) (literal("3"))]
 addVarProg = Prog [Rule (Comb "+" [Var "x", Var "y"]) (Var "x+y")]
