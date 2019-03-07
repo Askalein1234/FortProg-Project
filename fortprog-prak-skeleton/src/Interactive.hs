@@ -134,10 +134,10 @@ processInput p n l s input
   where
     loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String -> 
       IO (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
-    loadFile p' n' l' s' input = 
-      do loadInput <- if elem '.' input 
-                      then return (input) 
-                      else return (input ++ ".smolhs")
+    loadFile p' n' l' s' input' = 
+      do loadInput <- if elem '.' input' 
+                      then return (input') 
+                      else return (input' ++ ".smolhs")
          parseOut <- (parseFile::FilePath -> 
            IO (Either String Prog)) ((words loadInput)!!1)
          case parseOut of 
