@@ -1,0 +1,8 @@
+f a False c = True
+f a True  c = False
+
+false = False
+
+loop = loop
+
+f loop false loop
