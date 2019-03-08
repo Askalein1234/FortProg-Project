@@ -87,8 +87,8 @@ inputLoop (_, _, _, _, True)  = return ()
 inputLoop (p, n, l, s, False) = do
   setSGR [SetColor Foreground Dull Cyan]     -- make it fancy
   putStr (n ++ "> ")                         -- prompt the user to input stuff
-  hFlush stdout                              -- make the prompt appear
   setSGR [SetColor Foreground Vivid Cyan]    -- make it fancy
+  hFlush stdout                              -- make the prompt appear
   input <- getLine                           -- get the actual input
   setSGR [SetColor Foreground Vivid Magenta] -- make it fancy
   output <- processInput p n l s input       -- do what we are told to by input
