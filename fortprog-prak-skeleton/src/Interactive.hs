@@ -14,7 +14,7 @@ import PrettyPrinting
 import Reduction
 
 type ProgName = String
-type LastFileLoadCommand = String
+type LastFile = String
 type MarkForClose = Bool
 
 -- Three big String literals incomming!
@@ -79,7 +79,7 @@ startLoop = do
 
 -- The loop function that does some colour arrangements and calls itself
 -- to get more than one input.
-inputLoop :: (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
+inputLoop :: (Prog, ProgName, LastFile, Strategy, MarkForClose)
           -> IO ()
 -- if we did something to cause the program to perform a regular exit
 inputLoop (_, _, _, _, True)  = return ()
@@ -95,10 +95,10 @@ inputLoop (p, n, l, s, False) = do
   inputLoop output                           -- repeat
 
 -- parse input and forward to processing functions
-processInput :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String
+processInput :: Prog -> ProgName -> LastFile -> Strategy -> String
              -> IO ( Prog
                    , ProgName
-                   , LastFileLoadCommand
+                   , LastFile
                    , Strategy
                    , MarkForClose
                    )
@@ -117,8 +117,8 @@ processInput p n l s input
   | input == ":d" || 
     input == ":debug"  = do setSGR [SetColor Foreground Vivid Yellow]
                             putStrLn ("Prog:\n" ++ (pretty p) ++ 
-                                      "\nProgName: " ++ (show n) ++ 
-                                      "\nLastFileLoadCommand: " ++ (show l))
+                                      "\n\nProgName: " ++ (show n) ++ 
+                                      "\nLastFilePath: " ++ (show l))
                             setSGR [SetColor Background Dull Black]
                             return (p, n, l, s, False)
   -- show evaluation steps whilst evaluating evaluatable Term that user gave us
@@ -205,10 +205,10 @@ processInput p n l s input
                                 return (p, n, l, s, False)
   where
     -- you can load some files with this
-    loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String
+    loadFile :: Prog -> ProgName -> LastFile -> Strategy -> String
              -> IO ( Prog
                    , ProgName
-                   , LastFileLoadCommand
+                   , LastFile
                    , Strategy
                    , MarkForClose
                    )
