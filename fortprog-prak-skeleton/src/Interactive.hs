@@ -17,6 +17,8 @@ type ProgName = String
 type LastFileLoadCommand = String
 type MarkForClose = Bool
 
+-- Three big String literals incomming!
+-- Just here for the code to stay readable and this messages to be editable.
 header :: String
 header = unlines
   [ "                      _   _               _        _ _  "
@@ -60,6 +62,7 @@ quitMessage = unlines
   , "                                        "
   ]
 
+-- actual main function
 startLoop :: IO ()
 startLoop = do 
   clearScreen 
@@ -74,19 +77,24 @@ startLoop = do
   setTitle "Ordinary Console Title"
   setSGR [Reset]
 
+-- The loop function that does some colour arrangements and calls itself
+-- to get more than one input.
 inputLoop :: (Prog, ProgName, LastFileLoadCommand, Strategy, MarkForClose)
           -> IO ()
+-- if we did something to cause the program to perform a regular exit
 inputLoop (_, _, _, _, True)  = return ()
-inputLoop (p, n, l, s, False) = do 
-  setSGR [SetColor Foreground Dull Cyan]
-  putStr (n ++ "> ")
-  hFlush stdout
-  setSGR [SetColor Foreground Vivid Cyan]
-  input <- getLine
-  setSGR [SetColor Foreground Vivid Magenta]
-  output <- processInput p n l s input
-  inputLoop output
+-- if we did something that makes the program do something
+inputLoop (p, n, l, s, False) = do
+  setSGR [SetColor Foreground Dull Cyan]     -- make it fancy
+  putStr (n ++ "> ")                         -- prompt the user to input stuff
+  hFlush stdout                              -- make the prompt appear
+  setSGR [SetColor Foreground Vivid Cyan]    -- make it fancy
+  input <- getLine                           -- get the actual input
+  setSGR [SetColor Foreground Vivid Magenta] -- make it fancy
+  output <- processInput p n l s input       -- do what we are told to by input
+  inputLoop output                           -- repeat
 
+-- parse input and forward to processing functions
 processInput :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String
              -> IO ( Prog
                    , ProgName
@@ -95,12 +103,17 @@ processInput :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String
                    , MarkForClose
                    )
 processInput p n l s input 
+  -- told do do nothing by entering nothing. Seems legit.
   | input == ""        = do return (p, n, l, s, False)
+  -- output possibilities provided by smolhs Interpreter
+  -- (not the ones provided by Program)
   | input == ":h" || 
     input == ":help"   = do putStr helpMessage
                             return (p, n, l, s, False)
+  -- exit
   | input == ":q" || 
     input == ":quit"   = do return (p, n, l, s, True)
+  -- output some status info (of course fancy)
   | input == ":d" || 
     input == ":debug"  = do setSGR [SetColor Foreground Vivid Blue]
                             setSGR [SetColor Background  Vivid White]
@@ -109,50 +122,63 @@ processInput p n l s input
                                       "\nLastFileLoadCommand: " ++ (show l))
                             setSGR [SetColor Background Dull Black]
                             return (p, n, l, s, False)
+  -- show evaluation steps whilst evaluating evaluatable Term that user gave us
   | (words input)!!0 == ":d"
                        = do setSGR [SetColor Foreground Vivid Blue]
                             setSGR [SetColor Background  Vivid White]
+                            -- remove leading ":d "
                             input' <- return (drop 3 input)
-                            _ <- case 
+                            _ <- case
                                    (parse::String -> Either String Term) input'
                                    of Left m  -> do
                                         setSGR [SetColor Foreground Vivid Red]
-                                        putStrLn m
+                                        putStrLn m -- Thats the error message
                                         return (p, n, l, s, False)
                                       Right t -> do
                                         debugEval s p t
                                         return (p, n, l, s, False)
                             setSGR [SetColor Background Dull Black]
                             return (p, n, l, s, False)
+  -- reload the file, something could have changed
   | input == ":r" || 
-    input == ":reload" = if l == ""
+    input == ":reload" = if l == "" -- somehow no file is loaded! Unbelievable!
                          then do setSGR [SetColor Foreground Vivid Red]
                                  putStrLn "You haven't loaded a file yet!"
                                  return (p, n, l, s, False)
                          else do out <- loadFile p n l s l
                                  return out
+  -- unload program (why would you, it's kinda useless then)
   | input == ":l" || 
     input == ":load"   = do setTitle "Smol Haskell"
                             return (Prog [], "", l, s, False)
+  -- load some program so some actually useful stuff can happen
+  -- it's the program you type here, not some file, not in this case
   | ((words input)!!0 == ":l" ||
     (words input)!!0 == ":load") &&
     (words input)!!1 == "-d"
                        = case
-                           (parse::String -> Either String Prog) 
-                           (drop 6 (unlines (splitOn ", " input)))
+                           -- cut of the command and parse the remaining input
+                           (parse::String -> Either String Prog)
+                           (drop (4 + length ((words input)!!0))
+                           (unlines (splitOn ", " input)))
                            of Left m  -> do 
                                 setSGR [SetColor Foreground Vivid Red]
-                                putStrLn m
+                                putStrLn m  -- not a valid program dude
                                 return (p, n, l, s, False)
                               Right p' -> do
                                 setSGR [SetColor Foreground Vivid Green]
                                 putStrLn "Loaded program!"
                                 setTitle "Smol Haskell - Unnamed Program"
                                 return (p', n, l, s, False)
+  -- load some file so some actually useful stuff can happen
   | (words input)!!0 == ":l" ||
     (words input)!!0 == ":load"            
-                       = do out <- loadFile p n l s input
+                       -- cut off command and 
+                       -- pass it to the function that does the real doing
+                       = do out <- loadFile p n l s 
+                              (drop (1 + length ((words input)!!0)) input)
                             return out
+  -- choose your strategy
   | length (words input) == 2 && 
     ((words input)!!0 == ":s" ||
      (words input)!!0 == ":set")
@@ -167,18 +193,21 @@ processInput p n l s input
                              setSGR [SetColor Foreground Vivid Red]
                              putStrLn "I don't know that evaluation strategy :/"
                              return (p, n, l, s, False)
+  -- well, here is the stuff that let's users use their useful program
   | otherwise          = case
                            (parse::String -> Either String Term) input
                            of Left m  -> do
                                 setSGR [SetColor Foreground Vivid Red]
-                                putStrLn m
+                                putStrLn m  -- your program can't handle the input
                                 return (p, n, l, s, False)
                               Right t -> do
                                 setSGR [SetColor Foreground Vivid Green]
+                                -- pass it to the real evaluating function thing
                                 putStrLn $ pretty $ evaluateWith s p t
                                 return (p, n, l, s, False)
   where
-    loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String 
+    -- you can load some files with this
+    loadFile :: Prog -> ProgName -> LastFileLoadCommand -> Strategy -> String
              -> IO ( Prog
                    , ProgName
                    , LastFileLoadCommand
@@ -188,21 +217,23 @@ processInput p n l s input
     loadFile p' n' l' s' input' = 
       do loadInput <- if elem '.' input' 
                         then return (input') 
+                        -- let's add our file ending if none is present
                         else return (input' ++ ".smolhs")
          parseOut <- (parseFile::FilePath -> 
-           IO (Either String Prog)) ((words loadInput)!!1)
+           IO (Either String Prog)) loadInput -- the loading and parsing
          case parseOut of 
            Left m  -> do setSGR [SetColor Foreground Vivid Red]
-                         putStrLn m
+                         putStrLn m -- tried to parse invalid program
                          return (p', n', l', s', False)
            Right pr -> do setSGR [SetColor Foreground Vivid Green]
-                          putStrLn $ "Loaded " ++ takeBaseName 
-                            ((words loadInput)!!1) ++ "!"
+                          putStrLn $ "Loaded " ++ takeBaseName
+                            loadInput ++ "!"  -- tell the user the success
                           setTitle ("Smol Haskell - " ++ takeBaseName 
-                            ((words loadInput)!!1))
-                          return (pr, takeBaseName ((words loadInput)!!1), 
+                            loadInput)
+                          return (pr, takeBaseName loadInput, 
                             loadInput, s', False)
-                            
+
+    -- evaluates stuff with outputting the steps
     debugEval :: Strategy -> Prog -> Term -> IO ()
     debugEval s' p' t = if (isNormalForm p' t)
                       then do
