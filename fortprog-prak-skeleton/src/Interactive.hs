@@ -115,8 +115,7 @@ processInput p n l s input
     input == ":quit"   = do return (p, n, l, s, True)
   -- output some status info (of course fancy)
   | input == ":d" || 
-    input == ":debug"  = do setSGR [SetColor Foreground Vivid Blue]
-                            setSGR [SetColor Background  Vivid White]
+    input == ":debug"  = do setSGR [SetColor Foreground Vivid Yellow]
                             putStrLn ("Prog:\n" ++ (pretty p) ++ 
                                       "\nProgName: " ++ (show n) ++ 
                                       "\nLastFileLoadCommand: " ++ (show l))
@@ -124,8 +123,7 @@ processInput p n l s input
                             return (p, n, l, s, False)
   -- show evaluation steps whilst evaluating evaluatable Term that user gave us
   | (words input)!!0 == ":d"
-                       = do setSGR [SetColor Foreground Vivid Blue]
-                            setSGR [SetColor Background  Vivid White]
+                       = do setSGR [SetColor Foreground Vivid Yellow]
                             -- remove leading ":d "
                             input' <- return (drop 3 input)
                             _ <- case

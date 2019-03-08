@@ -29,7 +29,7 @@ three False b = True
 
 -- PO no RO, LO
 fourMain :: Bool
-fourMain = four (loop false) false (loop false)
+fourMain = four (loop False) (not false) (loop False)
 
 four :: Bool -> Bool -> Bool -> Bool
 four a False c = True
@@ -57,3 +57,7 @@ true = True
 loop :: Bool -> Bool
 loop False = loop True
 loop True  = loop False
+
+not :: Bool -> Bool
+not True  = False
+not False = True
